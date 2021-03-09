@@ -23,7 +23,7 @@ impl Expression {
     fn new(input_line: String) -> Expression {
         Expression {
             postfix : input_line,
-            expr: Vec::new(), // might need to change these 2 vectors 
+            expr: Vec::new(),  
             infix: Vec::new(), 
         }
     }
@@ -50,8 +50,8 @@ fn is_operator(op: char) -> bool {
 }
 
 // Needs a syntax check
-// add -> Vec<Expression> once this is debugged 
-fn build_expression_list(file_name: &String) {
+// add -> Result<Vec<Expression>, E> once this is debugged 
+fn build_expression_list(file_name: &str) {
     //opens the file and panics if it is not possible
     let file = File::open(file_name).expect("Failed to open file, check directory");
 
@@ -60,7 +60,10 @@ fn build_expression_list(file_name: &String) {
 
     println!("Contents of the file:");
     for line in reader.lines() {
-        println!("LINE: {}", line.unwrap());
+        println!("-----Here starts a new line------");
+        for c in line.expect("lines failed").chars() {
+           println!("Character: {}", c);
+        }
     }
 }
 
@@ -78,5 +81,5 @@ fn build_expression_list(file_name: &String) {
 
 fn main() {
     println!("Hello, world!");
-    build_expression_list(&"../ex.dat".to_string())
+    build_expression_list("ex.dat")
 }
