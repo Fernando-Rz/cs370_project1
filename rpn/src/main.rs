@@ -6,7 +6,7 @@
 //! **Authors** Fernando Rodriguez & Julia Januchowski
 //! **Version** March 15th 2021 
 
-use std::env::args;
+use std::env;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Error, Write};
 use std::process::exit; 
@@ -30,9 +30,12 @@ impl Expression {
 
     //solves the postfix expression 
     // TODO: write this function 
-    // fn solve(&mut self) {
-    //     self.postfix = ""
-    // }
+     fn solve(&mut self) {
+         let pfix = &self.postfix;
+         
+         let pfix = pfix.split_whitespace();
+         println!("this is the line after a split: {:?}", pfix);
+     }
 
     // need to print out the vectors in a different way or it will error 
     // fn to_string(&self) -> String {
@@ -132,6 +135,7 @@ fn build_expression_list(file_name: &str) -> Result<Vec<Expression>, Error>{
 // }
 
 fn main() {
-    println!("Hello, world!");
-    build_expression_list("ex.dat");
+    let args: Vec<String> = env::args().collect();
+
+    let result = build_expression_list(&args[1]);
 }
