@@ -58,44 +58,66 @@ fn is_white_space(c: char) -> bool {
     }
 }
 
-// we need to check for: white space, newline, tab character, invalid characters 
-// Needs a syntax check
-// add -> Result<Vec<Expression>, E> once this is debugged 
-fn build_expression_list(file_name: &str) {
+fn build_expression_list(file_name: &str) -> Result<Vec<Expression>, Error>{
     //opens the file and panics if it is not possible
     let file = File::open(file_name).expect("Failed to open file, check directory");
 
     // Create a new buffered reader for the file 
     let reader = BufReader::new(file);
     let mut vec_expr: Vec<Expression> = Vec::new();
-
-    println!("Contents of the file:");
+    // Iterates over all the lines in the file
     for line in reader.lines() {
-        println!("-----Here starts a new line------");
-        let mut postfix_epr = String::from("");
-
-        for c in line.expect("lines failed").chars() {
-           if is_operator(c) {
-               println!("Character: {}", c);
-               postfix_epr.push(c);
-           }
-           if !is_operator(c) {
-               if !is_white_space(c){
-                postfix_epr.push(c);
-                println!("Character: {}", c);
-               }
-           }
-        }
-        // Here is where we create new Expressions 
-        if postfix_epr != "" {
-            println!("this is the expression: {}", postfix_epr);
-            let expression = Expression::new(postfix_epr);
-            vec_expr.push(expression);
+        let line = line.unwrap();
+        println!("Line: {}",line);
+        //If line has contents create an expression, otherwise, skip it.
+        if line.len() > 0 {
+            
+            let express = Expression :: new(line);
+            vec_expr.push(express);
         }
     }
-
-    println!("Vector length {}", vec_expr.len());
+    Ok(vec_expr)
 }
+
+// we need to check for: white space, newline, tab character, invalid characters 
+// Needs a syntax check
+// add -> Result<Vec<Expression>, E> once this is debugged 
+//fn build_expression_list(file_name: &str) {
+//    //opens the file and panics if it is not possible
+//    let file = File::open(file_name).expect("Failed to open file, check directory");
+//
+    // Create a new buffered reader for the file 
+//    let reader = BufReader::new(file);
+//    let mut vec_expr: Vec<Expression> = Vec::new();
+
+//    println!("Contents of the file:");
+//    for line in reader.lines() {
+//        line.unwrap().split_whitespace();
+//        println!("-----Here starts a new line------");
+//        let mut postfix_epr = String::from("");
+
+//        for c in line.expect("lines failed").chars() {
+//           if is_operator(c) {
+//               println!("Character: {}", c);
+//               postfix_epr.push(c);
+//           }
+//           if !is_operator(c) {
+//               if !is_white_space(c){
+//                postfix_epr.push(c);
+//                println!("Character: {}", c);
+//               }
+//           }
+//        }
+        // Here is where we create new Expressions 
+//        if postfix_epr != "" {
+//            println!("this is the expression: {}", postfix_epr);
+//            let expression = Expression::new(postfix_epr);
+//            vec_expr.push(expression);
+//        }
+//    }
+
+//    println!("Vector length {}", vec_expr.len());
+//}
 
 // fn solve_list() {
 
@@ -111,5 +133,5 @@ fn build_expression_list(file_name: &str) {
 
 fn main() {
     println!("Hello, world!");
-    build_expression_list("ex.dat")
+    build_expression_list("ex.dat");
 }
