@@ -11,10 +11,9 @@ use std::fs::File;
 use std::io::{BufRead, BufReader, Error, Write};
 use std::process::exit; 
 
-// This struct respresents the object "Expression"
 struct Expression {
     postfix: String,  
-    expr: Vec<f64>, // might need to change this 
+    expr: Vec<f64>,  
     infix: Vec<String>,
 }
 
@@ -28,37 +27,73 @@ impl Expression {
         }
     }
 
-    //solves the postfix expression 
-    // TODO: write this function 
-     fn solve(&mut self) {
+    fn solve(&mut self) {
          let pfix = &self.postfix;
          
          let pfix = pfix.split_whitespace();
-         println!("this is the line after a split: {:?}", pfix);
-     }
-
-    // need to print out the vectors in a different way or it will error 
-    // fn to_string(&self) -> String {
-    //     format!("{} - {} - {}", self.postfix, self.expr, self.infix)
-    // }
-}
-
-fn is_operator(op: char) -> bool {
-    if op == '+' || op == '-' || op == '*' || op == '/' {
-        return true 
-    }
-    else {
-        return false 
+         for element in pfix {
+            if !is_operator(element) {
+                self.expr.push(element.parse::<f64>().expect("Cannot parse value to f64"));
+            }
+            else {
+                get_type(element, &mut self.expr, &mut self.infix);
+            }
+         }
     }
 }
 
-fn is_white_space(c: char) -> bool {
-    if c == ' ' {
+fn is_operator(op: &str) -> bool {
+    if op == "+" || op == "-" || op == "*" || op == "/" {
         return true
     }
     else {
         return false
     }
+}
+ 
+fn get_type(input_val: &str, expr_stack: &mut Vec<f64>, output: &mut Vec<String>) {
+    //operations that happen with all operators
+    let op1 = expr_stack[expr_stack.len()-1];
+    expr_stack.pop();
+    let op2 = expr_stack[expr_stack.len()-1];
+    expr_stack.pop();
+    
+    let mut answer = 0.0;
+    let mut infix_expr = String::from("");
+
+    match input_val {
+        "+" => {
+            answer = op1 + op2;
+            //expr_stack.push(answer);
+            infix_expr.push_str(&op2.to_string());
+            infix_expr.push_str(input_val);
+            infix_expr.push_str(&op1.to_string());
+            println!("This is infix_expr {}",infix_expr);
+            // infix_expr.push_str(input_value.to_string());
+            
+            println!("{} + {} = {}", op2.to_string(),op1.to_string(), answer.to_string());
+        }
+        "-" => {
+            println!("Here we subtract");
+            answer = op2 - op1;
+            //expr_stack.push(answer);
+            println!("{} - {} = {}", op2.to_string(),op1.to_string(), answer.to_string());
+        }
+        "*" => {
+            println!("Here we multiply");
+            answer = op1 * op2;
+            //expr_stack.push(answer);
+            println!("{} * {} = {}", op2.to_string(),op1.to_string(), answer.to_string());
+        }
+        _ => {
+            println!("Here we divide");
+            answer = op2 / op1;
+            //expr_stack.push(answer);
+            println!("{} / {} = {}", op2.to_string(),op1.to_string(), answer.to_string());
+        }
+    }
+    expr_stack.push(answer);
+    println!("Value[0] at the expr stack aka answer: {}", expr_stack[0]);
 }
 
 fn build_expression_list(file_name: &str) -> Result<Vec<Expression>, Error>{
@@ -82,50 +117,15 @@ fn build_expression_list(file_name: &str) -> Result<Vec<Expression>, Error>{
     Ok(vec_expr)
 }
 
-// we need to check for: white space, newline, tab character, invalid characters 
-// Needs a syntax check
-// add -> Result<Vec<Expression>, E> once this is debugged 
-//fn build_expression_list(file_name: &str) {
-//    //opens the file and panics if it is not possible
-//    let file = File::open(file_name).expect("Failed to open file, check directory");
-//
-    // Create a new buffered reader for the file 
-//    let reader = BufReader::new(file);
-//    let mut vec_expr: Vec<Expression> = Vec::new();
+//here we just iterate over the vector of expressions and call solve() on all of them 
+fn solve_list(exp_list: Vec<Expression>) {
+    for mut i in exp_list {
+        i.solve();
+        println!("Solved one vector");
+    }
+}
 
-//    println!("Contents of the file:");
-//    for line in reader.lines() {
-//        line.unwrap().split_whitespace();
-//        println!("-----Here starts a new line------");
-//        let mut postfix_epr = String::from("");
-
-//        for c in line.expect("lines failed").chars() {
-//           if is_operator(c) {
-//               println!("Character: {}", c);
-//               postfix_epr.push(c);
-//           }
-//           if !is_operator(c) {
-//               if !is_white_space(c){
-//                postfix_epr.push(c);
-//                println!("Character: {}", c);
-//               }
-//           }
-//        }
-        // Here is where we create new Expressions 
-//        if postfix_epr != "" {
-//            println!("this is the expression: {}", postfix_epr);
-//            let expression = Expression::new(postfix_epr);
-//            vec_expr.push(expression);
-//        }
-//    }
-
-//    println!("Vector length {}", vec_expr.len());
-//}
-
-// fn solve_list() {
-
-// }
-
+//iterate over expressions and sort based on expr[0]
 // fn sort_list() {
 
 // }
@@ -136,6 +136,12 @@ fn build_expression_list(file_name: &str) -> Result<Vec<Expression>, Error>{
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-
-    let result = build_expression_list(&args[1]);
+    //change to 3 once we get writing to a file working 
+    if args.len() != 2 {
+        println!("Usage: cargo run [input file] [output file]");
+        exit(1);
+    }
+    
+    let result = build_expression_list(&args[1]).unwrap();
+    solve_list(result)
 }
