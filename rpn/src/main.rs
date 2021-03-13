@@ -34,9 +34,11 @@ impl Expression {
          for element in pfix {
             if !is_operator(element) {
                 self.expr.push(element.parse::<f64>().expect("Cannot parse value to f64"));
+                self.infix.push(element.to_string());
             }
             else {
                 get_type(element, &mut self.expr, &mut self.infix);
+                println!("Vector is {:?}", self.infix);
             }
          }
     }
@@ -51,49 +53,36 @@ fn is_operator(op: &str) -> bool {
     }
 }
  
-fn get_type(input_val: &str, expr_stack: &mut Vec<f64>, output: &mut Vec<String>) {
+fn get_type(input_val: &str, expr_stack: &mut Vec<f64>, infix_stack: &mut Vec<String>) {
     //operations that happen with all operators
-    let op1 = expr_stack[expr_stack.len()-1];
-    expr_stack.pop();
     let op2 = expr_stack[expr_stack.len()-1];
+    expr_stack.pop();
+    let op1 = expr_stack[expr_stack.len()-1];
     expr_stack.pop();
     
     let mut answer = 0.0;
-    let mut infix_expr = String::from("");
+    //let mut infix_expr = String::from("");
+    let infix_expr_2 = infix_stack.pop().expect("Invalid input contained in file");
+    let infix_expr_1 = infix_stack.pop().expect("Invalid input contained in file");
 
     match input_val {
         "+" => {
             answer = op1 + op2;
-            //expr_stack.push(answer);
-            infix_expr.push_str(&op2.to_string());
-            infix_expr.push_str(input_val);
-            infix_expr.push_str(&op1.to_string());
-            println!("This is infix_expr {}",infix_expr);
-            // infix_expr.push_str(input_value.to_string());
-            
-            println!("{} + {} = {}", op2.to_string(),op1.to_string(), answer.to_string());
-        }
+            }
         "-" => {
-            println!("Here we subtract");
-            answer = op2 - op1;
-            //expr_stack.push(answer);
-            println!("{} - {} = {}", op2.to_string(),op1.to_string(), answer.to_string());
-        }
+            answer = op1 - op2;
+            }
         "*" => {
-            println!("Here we multiply");
             answer = op1 * op2;
-            //expr_stack.push(answer);
-            println!("{} * {} = {}", op2.to_string(),op1.to_string(), answer.to_string());
-        }
+            }
         _ => {
-            println!("Here we divide");
-            answer = op2 / op1;
-            //expr_stack.push(answer);
-            println!("{} / {} = {}", op2.to_string(),op1.to_string(), answer.to_string());
-        }
+            answer = op1 / op2;
+            
+            }
     }
+    let infix_string = format!("({} {} {})", infix_expr_1,input_val,infix_expr_2);
     expr_stack.push(answer);
-    println!("Value[0] at the expr stack aka answer: {}", expr_stack[0]);
+    infix_stack.push(infix_string);
 }
 
 fn build_expression_list(file_name: &str) -> Result<Vec<Expression>, Error>{
