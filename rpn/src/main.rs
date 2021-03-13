@@ -26,16 +26,23 @@ impl Expression {
             infix: Vec::new(), 
         }
     }
-
+    
+    /// Solves the postfix expressions for the current expression
+    ///
+    /// # Arguments
+    /// * 'self' - The current expression we are working on
     fn solve(&mut self) {
          let pfix = &self.postfix;
-         
          let pfix = pfix.split_whitespace();
+         //For every element in postfix 
          for element in pfix {
+            // If the current element is not an operator try to parse it into a f64 if it does not 
+            // parse it, it is not an operator or a number so throw an error.
             if !is_operator(element) {
                 self.expr.push(element.parse::<f64>().expect("Cannot parse value to f64"));
                 self.infix.push(element.to_string());
             }
+            //if it is an operator call the "get_type" function to solve the current infix expression
             else {
                 get_type(element, &mut self.expr, &mut self.infix);
                 println!("Vector is {:?}", self.infix);
@@ -44,6 +51,14 @@ impl Expression {
     }
 }
 
+/// Solves the postfix expressions for the current expression
+///
+/// # Arguments
+/// * 'self' - The current expression we are working on
+/// 
+/// # Returns
+/// a boolean value - true if it is an operator
+///                 - false if it is not an operator 
 fn is_operator(op: &str) -> bool {
     if op == "+" || op == "-" || op == "*" || op == "/" {
         return true
@@ -52,7 +67,13 @@ fn is_operator(op: &str) -> bool {
         return false
     }
 }
- 
+
+/// determines the type of operator, then preforms the operation as well as formats the infix expression
+///
+/// # Arguments
+/// * 'input_val' - the current operator
+/// * 'expr_stack' - The current expression vector
+/// * 'infix_stack' - the current infix expression
 fn get_type(input_val: &str, expr_stack: &mut Vec<f64>, infix_stack: &mut Vec<String>) {
     //operations that happen with all operators
     let op2 = expr_stack[expr_stack.len()-1];
@@ -61,10 +82,12 @@ fn get_type(input_val: &str, expr_stack: &mut Vec<f64>, infix_stack: &mut Vec<St
     expr_stack.pop();
     
     let mut answer = 0.0;
-    //let mut infix_expr = String::from("");
+
     let infix_expr_2 = infix_stack.pop().expect("Invalid input contained in file");
     let infix_expr_1 = infix_stack.pop().expect("Invalid input contained in file");
-
+    
+    // a match statement used to determine what operator is being used, and then used to peform that
+    // operation and push it onto the expr_stack
     match input_val {
         "+" => {
             answer = op1 + op2;
@@ -80,11 +103,21 @@ fn get_type(input_val: &str, expr_stack: &mut Vec<f64>, infix_stack: &mut Vec<St
             
             }
     }
+    // pushes the correct infix expression onto the infix field of the expression
     let infix_string = format!("({} {} {})", infix_expr_1,input_val,infix_expr_2);
     expr_stack.push(answer);
     infix_stack.push(infix_string);
 }
 
+/// Builds a list of expressions by reading the current line of the input file and turning them into
+/// Expressions and then pushes it onto a vector.
+/// 
+/// # Arguments
+/// * 'file_name' - a string slice that holds the name of the input file
+/// 
+/// # Returns
+/// a result vector holding postfix expressions or an error
+/// 
 fn build_expression_list(file_name: &str) -> Result<Vec<Expression>, Error>{
     //opens the file and panics if it is not possible
     let file = File::open(file_name).expect("Failed to open file, check directory");
