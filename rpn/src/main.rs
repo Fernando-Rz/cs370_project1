@@ -143,20 +143,16 @@ fn build_expression_list(file_name: &str) -> Result<Vec<Expression>, Error>{
 fn solve_list(exp_list: &mut Vec<Expression>) {
     for i in exp_list {
         i.solve();
+        if i.expr.len() == 0{
+            i.expr.push(f64::MAX)
+        }
         println!("Solved one vector");
     }
 }
 
-//iterate over expressions and sort based on expr[0]
-// Vec [ Expr, Expr]
 fn sort_list(exp_list: &mut Vec<Expression>) {
-    println!("The length of the expr vector : {}", exp_list.len());
-    // len here is 4
     for i in 0..exp_list.len() {
-        println!("This is i : {}", i);
-        println!("This is the vector: {:?}", exp_list[i].expr);
-        for j in 0..exp_list.len() - i -1 {
-            println!("This is j : {}", j);
+        for j in 0..(exp_list.len() - i -1) {
             if exp_list[j + 1].expr[0] < exp_list[j].expr[0] {
                 exp_list.swap(j, j + 1 );
             }
@@ -181,5 +177,8 @@ fn main() {
     let result = &mut build_expression_list(&args[1]).unwrap();
     solve_list(result);
     sort_list(result);
+    for i in 0..result.len() {
+        println!("element: {}", result[i].expr[0].to_string());
+    }
 
 }
