@@ -140,22 +140,36 @@ fn build_expression_list(file_name: &str) -> Result<Vec<Expression>, Error>{
 }
 
 //here we just iterate over the vector of expressions and call solve() on all of them 
-fn solve_list(exp_list: Vec<Expression>) {
-    for mut i in exp_list {
+fn solve_list(exp_list: &mut Vec<Expression>) {
+    for i in exp_list {
         i.solve();
         println!("Solved one vector");
     }
 }
 
 //iterate over expressions and sort based on expr[0]
-// fn sort_list() {
-
-// }
+// Vec [ Expr, Expr]
+fn sort_list(exp_list: &mut Vec<Expression>) {
+    println!("The length of the expr vector : {}", exp_list.len());
+    // len here is 4
+    for i in 0..exp_list.len() {
+        println!("This is i : {}", i);
+        println!("This is the vector: {:?}", exp_list[i].expr);
+        for j in 0..exp_list.len() - i -1 {
+            println!("This is j : {}", j);
+            if exp_list[j + 1].expr[0] < exp_list[j].expr[0] {
+                exp_list.swap(j, j + 1 );
+            }
+        }
+    }
+}
 
 // fn write_to_file() {
 
 // }
 
+
+//main vector = {Expr: postfix = "", expr [], Expr, Expr, Expr}
 fn main() {
     let args: Vec<String> = env::args().collect();
     //change to 3 once we get writing to a file working 
@@ -164,6 +178,8 @@ fn main() {
         exit(1);
     }
     
-    let result = build_expression_list(&args[1]).unwrap();
-    solve_list(result)
+    let result = &mut build_expression_list(&args[1]).unwrap();
+    solve_list(result);
+    sort_list(result);
+
 }
