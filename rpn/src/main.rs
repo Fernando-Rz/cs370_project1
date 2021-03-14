@@ -81,7 +81,7 @@ fn get_type(input_val: &str, expr_stack: &mut Vec<f64>, infix_stack: &mut Vec<St
     let op1 = expr_stack[expr_stack.len()-1];
     expr_stack.pop();
     
-    let mut answer = 0.0;
+    let answer : f64;
 
     let infix_expr_2 = infix_stack.pop().expect("Invalid input contained in file");
     let infix_expr_1 = infix_stack.pop().expect("Invalid input contained in file");
@@ -165,11 +165,11 @@ fn sort_list(exp_list: &mut Vec<Expression>) {
     
     for exp in exp_list{
         // let output_infix = exp_list.infix[1,-1]; TODO: remove parenthesis from begining and end
-
         let mut infix_out = exp.infix.get(0).unwrap().to_string();
         infix_out.remove(0);
         infix_out.remove(infix_out.len()-1);
         let exp_out = exp.expr.get(0).unwrap().to_string();
+        
 
         out_buffer.write(&format!("{} = {}\n", infix_out, exp_out).into_bytes());
     }
