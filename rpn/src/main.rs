@@ -160,16 +160,27 @@ fn sort_list(exp_list: &mut Vec<Expression>) {
     }
 }
 
-// fn write_to_file() {
+ fn write_to_file(file_name: &str, exp_list: &mut Vec<Expression>){
+    let mut out_buffer = File::create(file_name).expect("Unable to create output file");
+    
+    for exp in exp_list{
+        // let output_infix = exp_list.infix[1,-1]; TODO: remove parenthesis from begining and end
 
-// }
+        let mut infix_out = exp.infix.get(0).unwrap().to_string();
+        infix_out.remove(0);
+        infix_out.remove(infix_out.len()-1);
+        let exp_out = exp.expr.get(0).unwrap().to_string();
+
+        out_buffer.write(&format!("{} = {}\n", infix_out, exp_out).into_bytes());
+    }
+ }
 
 
 //main vector = {Expr: postfix = "", expr [], Expr, Expr, Expr}
 fn main() {
     let args: Vec<String> = env::args().collect();
     //change to 3 once we get writing to a file working 
-    if args.len() != 2 {
+    if args.len() != 3 {
         println!("Usage: cargo run [input file] [output file]");
         exit(1);
     }
@@ -177,6 +188,8 @@ fn main() {
     let result = &mut build_expression_list(&args[1]).unwrap();
     solve_list(result);
     sort_list(result);
+    write_to_file(&args[2], result);
+
     for i in 0..result.len() {
         println!("element: {}", result[i].expr[0].to_string());
     }
